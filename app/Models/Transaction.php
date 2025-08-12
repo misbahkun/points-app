@@ -12,10 +12,14 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'amount',
-        'transacted_at',
+        'description',
+        'transacted_at'
     ];
 
-    protected $dates = ['transacted_at'];
+    protected $casts = [
+        'transacted_at' => 'datetime',
+        'amount' => 'integer'
+    ];
 
     public function point()
     {

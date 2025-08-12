@@ -1,0 +1,177 @@
+{
+	"info": {
+		"_postman_id": "b657b097-3e9d-457e-89e4-77d609a83ee8",
+		"name": "Laravel Points API (Laravel 12)",
+		"description": "Collection untuk API Poin Reward:\n\n- POST /transactions (HMAC protected)\n    \n- GET /transactions (pagination)\n    \n- POST /transactions/seed (seed dummy data)\n    \n\nVariable yang digunakan:\n\n- base_url = [http://localhost:8000](http://localhost:8000/api)\n    \n- hmac_secret = verysecret",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27168336"
+	},
+	"item": [
+		{
+			"name": "Create Transaction (HMAC)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const secret = pm.collectionVariables.get('hmac_secret');",
+							"",
+							"const body = (pm.request.body && pm.request.body.raw) ? pm.request.body.raw : '';",
+							"",
+							"const timestamp = new Date().toISOString();",
+							"",
+							"pm.request.headers.upsert({ key: 'X-Timestamp', value: timestamp });",
+							"",
+							"const hmac = CryptoJS.HmacSHA256(timestamp + body, secret);",
+							"",
+							"pm.request.headers.upsert({ key: 'X-Signature', value: hmac.toString() });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status 201', function () {",
+							"  pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": 1,\n  \"amount\": 50000,\n  \"description\": \"Pembelian produk A\",\n  \"transacted_at\": \"2025-07-01 16:40:15\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/transactions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Transactions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status 200', function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/transactions?start_date=2024-07-30&end_date=2025-07-30&page=2&per_page=20",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "start_date",
+							"value": "2024-07-30"
+						},
+						{
+							"key": "end_date",
+							"value": "2025-07-30"
+						},
+						{
+							"key": "page",
+							"value": "2"
+						},
+						{
+							"key": "per_page",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Seed Dummy Transactions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status 201', function () {",
+							"  pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"count\": 1000\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/transactions/seed",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"transactions",
+						"seed"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api"
+		},
+		{
+			"key": "hmac_secret",
+			"value": "verysecret"
+		}
+	]
+}
