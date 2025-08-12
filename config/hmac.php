@@ -1,5 +1,5 @@
 <?php
 
 return [
-  'secret' => env('HMAC_SECRET', 'defaultsecret'),
+  'secret' => env('HMAC_SECRET', 'verysecret'),
 ];
